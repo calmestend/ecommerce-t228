@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
 use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\Sale;
@@ -59,10 +58,9 @@ class CheckoutController extends Controller
             'cartItems' => json_encode($cartItems)
         ]);
 
-        $invoice = Invoice::create(['sale_id' => $request->sale_id]);
-        InvoiceController::createPDF($request);
+        InvoiceController::downloadPdf($request);
 
-        InvoiceController::createXML($request);
+        InvoiceController::downloadXml($request);
 
         return view('client.checkout', compact(['cartItems', 'saleId']));
     }

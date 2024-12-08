@@ -11,25 +11,21 @@
                 <div class="p-6 text-gray-900">
                     <h1>Payment successfully created</h1>
 
-                    <form action="{{ route('invoice.store') }}" method="post">
+                    <form action="{{ route('invoice.download.pdf') }}" method="post" class="mb-4">
                         @csrf
-                        <div class="flex flex-col py-4 my-2">
-                            <input type="hidden" name="cartItems" value="{{ json_encode($cartItems) }}">
-                            <input type="hidden" name="sale_id" value="{{ $saleId }}">
+                        <input type="hidden" name="sale_id" value="{{ $saleId }}">
+                        <x-primary-button>Download PDF Invoice</x-primary-button>
+                    </form>
 
-                            <label for="rfc">RFC</label>
-                            <input type="text" name="rfc" id="rfc" />
-
-                            <label for="address">Address</label>
-                            <input type="text" name="address" id="address" />
-
-                            <label for="phone_number">Phone Number</label>
-                            <input type="text" name="phone_number" id="phone_number" />
-                        </div>
-                        <x-primary-button>Download Invoice</x-primary-button>
+                    <form action="{{ route('invoice.download.xml') }}" method="post" id="xmlForm">
+                        @csrf
+                        <input type="hidden" name="sale_id" value="{{ $saleId }}">
+                        <x-primary-button>Download XML Invoice</x-primary-button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+
 </x-app-layout>

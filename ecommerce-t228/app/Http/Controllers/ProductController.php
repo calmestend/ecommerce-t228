@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WishList;
-use App\Models\WishListProducts;
+use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class WishListController extends Controller
+class ProductController extends Controller
 {
     private $headers = [
     "Access-Control-Allow-Origin" => "*",
@@ -18,26 +16,14 @@ class WishListController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function indexView()
-    {
-        $wishListId = Auth::user()->wish_list->id;
-        $wishList = WishList::findOrFail($wishListId);
-        $wishListProducts = WishListProducts::where('wish_list_id', $wishList->id)->get();
-
-        return view('client.wish_list', compact('wishListProducts'));
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         try {
-            $wishLists = WishList::all();
-            $message = $wishLists ? "Wish Lists found" : "Wish Lists not found";
+            $products = Product::all();
+            $message = $products ? "Products found" : "Categories not found";
             $status = 200;
             $response = [
-                'data' => $wishLists ?? '',
+                'data' => $products ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -59,13 +45,25 @@ class WishListController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required'
+                'name' => 'required',
+                'description' => 'required',
+                'thumbnail' => 'required',
+                'cost' => 'required',
+                'price' => 'required',
+                'category_id' => 'required',
             ]);
-            $wishList = WishList::create(['user_id' => $request->user_id]);
-            $message = $wishList ? "Wish Lists created" : "Wish Lists cannot be created";
+            $product = Product::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'thumbnail' => $request->thumbnail,
+                'cost' => $request->cost,
+                'price' => $request->price,
+                'category_id' => $request->category_id,
+            ]);
+            $message = $product ? "Products created" : "Categories cannot be created";
             $status = 201;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $product ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -85,11 +83,11 @@ class WishListController extends Controller
     public function show(string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List found" : "Wish List not found";
+            $product = Product::find($id);
+            $message = $product ? "Product found" : "Product not found";
             $status = 200;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $product ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -109,17 +107,24 @@ class WishListController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List updated" : "Wish List cannot be updated";
-            $status = $wishList ? 202 : 404;
+            $product = Product::find($id);
+            $message = $product ? "Product updated" : "Product cannot be updated";
+            $status = $product ? 202 : 404;
 
 
-            if ($wishList) {
-                $wishList->update($request->only(['user_id']));
+            if ($product) {
+                $product->update($request->only([
+                    'name',
+                    'description',
+                    'thumbnail',
+                    'cost',
+                    'price',
+                    'category_id',
+                ]));
             }
 
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $product ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -139,13 +144,13 @@ class WishListController extends Controller
     public function destroy(string $id)
     {
         try {
-            $wishList = WishList::find($id);
+            $product = Product::find($id);
 
-            if ($wishList) {
-                $wishList->delete($id);
+            if ($product) {
+                $product->delete($id);
             }
-            $message = $wishList ? "Wish List destroyed" : "Wish List cannot be destroyed";
-            $status = $wishList ? 202 : 404;
+            $message = $product ? "Product destroyed" : "Product cannot be destroyed";
+            $status = $product ? 202 : 404;
             $response = [
                 'message' => $message,
                 'status' => $status,

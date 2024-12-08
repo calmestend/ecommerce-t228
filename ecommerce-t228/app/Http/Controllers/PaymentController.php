@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WishList;
-use App\Models\WishListProducts;
+use App\Models\Payment;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class WishListController extends Controller
+class PaymentController extends Controller
 {
     private $headers = [
     "Access-Control-Allow-Origin" => "*",
@@ -18,26 +16,14 @@ class WishListController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function indexView()
-    {
-        $wishListId = Auth::user()->wish_list->id;
-        $wishList = WishList::findOrFail($wishListId);
-        $wishListProducts = WishListProducts::where('wish_list_id', $wishList->id)->get();
-
-        return view('client.wish_list', compact('wishListProducts'));
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         try {
-            $wishLists = WishList::all();
-            $message = $wishLists ? "Wish Lists found" : "Wish Lists not found";
+            $payments = Payment::all();
+            $message = $payments ? "Payments found" : "Payments not found";
             $status = 200;
             $response = [
-                'data' => $wishLists ?? '',
+                'data' => $payments ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -59,13 +45,19 @@ class WishListController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required'
+                'sale_id' => 'required',
+                'amount' => 'required'
             ]);
-            $wishList = WishList::create(['user_id' => $request->user_id]);
-            $message = $wishList ? "Wish Lists created" : "Wish Lists cannot be created";
+
+            $payment = Payment::create([
+                'sale_id' => $request->sale_id,
+                'amount' => $request->amount
+            ]);
+
+            $message = $payment ? "Payments created" : "Payments cannot be created";
             $status = 201;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $payment ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -85,11 +77,11 @@ class WishListController extends Controller
     public function show(string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List found" : "Wish List not found";
+            $payment = Payment::find($id);
+            $message = $payment ? "Payment found" : "Payment not found";
             $status = 200;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $payment ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -109,17 +101,17 @@ class WishListController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List updated" : "Wish List cannot be updated";
-            $status = $wishList ? 202 : 404;
+            $payment = Payment::find($id);
+            $message = $payment ? "Payment updated" : "Payment cannot be updated";
+            $status = $payment ? 202 : 404;
 
 
-            if ($wishList) {
-                $wishList->update($request->only(['user_id']));
+            if ($payment) {
+                $payment->update($request->only(['sale_id', 'amount']));
             }
 
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $payment ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -139,13 +131,13 @@ class WishListController extends Controller
     public function destroy(string $id)
     {
         try {
-            $wishList = WishList::find($id);
+            $payment = Payment::find($id);
 
-            if ($wishList) {
-                $wishList->delete($id);
+            if ($payment) {
+                $payment->delete($id);
             }
-            $message = $wishList ? "Wish List destroyed" : "Wish List cannot be destroyed";
-            $status = $wishList ? 202 : 404;
+            $message = $payment ? "Payment destroyed" : "Payment cannot be destroyed";
+            $status = $payment ? 202 : 404;
             $response = [
                 'message' => $message,
                 'status' => $status,

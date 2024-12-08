@@ -29,6 +29,11 @@
                     @else
                     <h2>You don't have any products in your wish list</h2>
                     @endif
+                    @if(session('message'))
+                    <p class="bg-yellow-200 text-yellow-800 p-4 rounded-lg mb-4">
+                        {{ session('message') }}
+                    </p>
+                    @endif
                 </div>
             </div>
         </div>

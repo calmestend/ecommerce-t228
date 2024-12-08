@@ -14,9 +14,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/catalogue', [CatalogueController::class, "index"])->name('catalogue');
 
     // Wish List
-    Route::get('/wish_list', [WishListController::class, "index"])->name('wish_list');
-    Route::post('/wish_list/store', [WishListProductController::class, "store"])->name('wish_list_products.store');
-    Route::post('/wish_list/destroy/{id}', [WishListProductController::class, "destroy"])->name('wish_list_products.destroy');
+    Route::get('/wish_list', [WishListController::class, "indexView"])->name('wish_list');
+    Route::post('/wish_list/store', [WishListProductController::class, "storeView"])->name('wish_list_products.store');
+    Route::post('/wish_list/destroy/{id}', [WishListProductController::class, "destroyView"])->name('wish_list_products.destroy');
 
     // Shopping Cart
     Route::get('/shopping_cart', [ShoppingCartController::class, "index"])->name('shopping_cart');
@@ -30,7 +30,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/paypal/cancel', [PayPalController::class, "cancel"])->name('paypal.cancel');
 
     // Invoice
-    Route::post('/invoice/store', [InvoiceController::class, "store"])->name('invoice.store');
+    Route::post('/invoice/download/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoice.download.pdf');
+    Route::post('/invoice/download/xml', [InvoiceController::class, 'downloadXml'])->name('invoice.download.xml');
+
 
     // Shopping History
     Route::get('/shopping_history', [ShoppingHistoryController::class, "index"])->name('shopping_history');

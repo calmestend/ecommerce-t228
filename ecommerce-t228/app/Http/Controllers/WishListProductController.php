@@ -3,31 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\WishListProducts;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class WishListProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    private $headers = [
+    "Access-Control-Allow-Origin" => "*",
+    "Content-type" => "application/json",
+    ];
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function storeView(Request $request)
     {
         $request->validate([
             'product_id' => 'required',
@@ -47,7 +34,73 @@ class WishListProductController extends Controller
             'wish_list_id' => $request->wish_list_id
         ]);
 
-        return redirect()->route('wish_list');
+        return redirect()->route('wish_list')->with("message", "Agregado a favoritos");
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroyView(string $id)
+    {
+        $wishListProduct = WishListProducts::findOrFail($id);
+        $wishListProduct->delete();
+        return redirect()->back()->with("message", "Producto eliminado");
+    }
+
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        try {
+            $wishListProducts = WishListProducts::all();
+            $message = $wishListProducts ? "Wish List Products found" : "Wish List Products not found";
+            $status = 200;
+            $response = [
+                'data' => $wishListProducts ?? '',
+                'message' => $message,
+                'status' => $status,
+            ];
+            return response()->json(compact('response'))->withHeaders($this->headers);
+        } catch (Exception $error) {
+            $response = array(
+                'message' => 'Something went wrong',
+                'status' => 500,
+                'error' => $error
+            );
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+
+    public function store(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required'
+            ]);
+            $wishListProduct = WishListProducts::create([
+                'product_id' => $request->product_id,
+                'wish_list_id' => $request->wish_list_id
+            ]);
+            $message = $wishListProduct ? "Wish List Products created" : "WishListProducts cannot be created";
+            $status = 201;
+            $response = [
+                'data' => $wishListProduct ?? '',
+                'message' => $message,
+                'status' => $status,
+            ];
+            return response()->json(compact('response'))->withHeaders($this->headers);
+        } catch (Exception $error) {
+            $response = array(
+                'message' => 'Something went wrong',
+                'status' => 500,
+                'error' => $error
+            );
+        }
     }
 
     /**
@@ -55,15 +108,23 @@ class WishListProductController extends Controller
      */
     public function show(string $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        try {
+            $wishListProduct = WishListProducts::find($id);
+            $message = $wishListProduct ? "WishListProduct found" : "WishListProduct not found";
+            $status = 200;
+            $response = [
+                'data' => $wishListProduct ?? '',
+                'message' => $message,
+                'status' => $status,
+            ];
+            return response()->json(compact('response'))->withHeaders($this->headers);
+        } catch (Exception $error) {
+            $response = array(
+                'message' => 'Something went wrong',
+                'status' => 500,
+                'error' => $error
+            );
+        }
     }
 
     /**
@@ -71,7 +132,32 @@ class WishListProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $wishListProduct = WishListProducts::find($id);
+            $message = $wishListProduct ? "Wish List Product updated" : "Wish List Product cannot be updated";
+            $status = $wishListProduct ? 202 : 404;
+
+
+            if ($wishListProduct) {
+                $wishListProduct->update($request->only([
+                    'product_id',
+                    'wish_list_id',
+                ]));
+            }
+
+            $response = [
+                'data' => $wishListProduct ?? '',
+                'message' => $message,
+                'status' => $status,
+            ];
+            return response()->json(compact('response'))->withHeaders($this->headers);
+        } catch (Exception $error) {
+            $response = array(
+                'message' => 'Something went wrong',
+                'status' => 500,
+                'error' => $error
+            );
+        }
     }
 
     /**
@@ -79,8 +165,25 @@ class WishListProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $wishListProduct = WishListProducts::findOrFail($id);
-        $wishListProduct->delete();
-        return redirect()->back();
+        try {
+            $wishListProduct = WishListProducts::find($id);
+
+            if ($wishListProduct) {
+                $wishListProduct->delete($id);
+            }
+            $message = $wishListProduct ? "Wish List Product destroyed" : "Wish List Product cannot be destroyed";
+            $status = $wishListProduct ? 202 : 404;
+            $response = [
+                'message' => $message,
+                'status' => $status,
+            ];
+            return response()->json(compact('response'))->withHeaders($this->headers);
+        } catch (Exception $error) {
+            $response = array(
+                'message' => 'Something went wrong',
+                'status' => 500,
+                'error' => $error
+            );
+        }
     }
 }

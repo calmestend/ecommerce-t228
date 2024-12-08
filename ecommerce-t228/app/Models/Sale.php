@@ -7,4 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Sale extends Model
 {
     protected $fillable = ['user_id'];
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

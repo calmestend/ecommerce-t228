@@ -81,7 +81,7 @@ class ShoppingCartController extends Controller
 
         $cart[$stock->id] = ['quantity' => (int) $request->quantity];
         session()->put('cart', $cart);
-        return redirect()->route('shopping_cart');
+        return redirect()->route('shopping_cart')->with("message", "Producto agregado");
     }
 
     /**
@@ -118,7 +118,7 @@ class ShoppingCartController extends Controller
             unset($cart[$stock_id]);
             session()->put('cart', $cart);
         }
-        return redirect()->back();
+        return redirect()->back()->with("message", "Producto eliminado");
     }
 
     public function destroyAll()

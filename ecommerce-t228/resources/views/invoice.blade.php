@@ -18,7 +18,6 @@
         <p><strong>Phone Number:</strong> {{ $issuer['phone_number'] }}</p>
 
         <h2>Receiver</h2>
-        <p><strong>Invoice ID:</strong> {{ $receiver['invoice_id'] }}</p>
         <p><strong>RFC:</strong> {{ $receiver['rfc'] }}</p>
         <p><strong>Address:</strong> {{ $receiver['address'] }}</p>
         <p><strong>Phone Number:</strong> {{ $receiver['phone_number'] }}</p>

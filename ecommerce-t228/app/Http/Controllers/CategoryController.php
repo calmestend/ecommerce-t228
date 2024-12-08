@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WishList;
-use App\Models\WishListProducts;
+use App\Models\Category;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class WishListController extends Controller
+class CategoryController extends Controller
 {
     private $headers = [
     "Access-Control-Allow-Origin" => "*",
@@ -18,26 +16,14 @@ class WishListController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function indexView()
-    {
-        $wishListId = Auth::user()->wish_list->id;
-        $wishList = WishList::findOrFail($wishListId);
-        $wishListProducts = WishListProducts::where('wish_list_id', $wishList->id)->get();
-
-        return view('client.wish_list', compact('wishListProducts'));
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         try {
-            $wishLists = WishList::all();
-            $message = $wishLists ? "Wish Lists found" : "Wish Lists not found";
+            $categories = Category::all();
+            $message = $categories ? "Categories found" : "Categories not found";
             $status = 200;
             $response = [
-                'data' => $wishLists ?? '',
+                'data' => $categories ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -61,11 +47,11 @@ class WishListController extends Controller
             $request->validate([
                 'name' => 'required'
             ]);
-            $wishList = WishList::create(['user_id' => $request->user_id]);
-            $message = $wishList ? "Wish Lists created" : "Wish Lists cannot be created";
+            $category = Category::create(['name' => $request->name]);
+            $message = $category ? "Categories created" : "Categories cannot be created";
             $status = 201;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $category ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -85,11 +71,11 @@ class WishListController extends Controller
     public function show(string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List found" : "Wish List not found";
+            $category = Category::find($id);
+            $message = $category ? "Category found" : "Category not found";
             $status = 200;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $category ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -109,17 +95,17 @@ class WishListController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List updated" : "Wish List cannot be updated";
-            $status = $wishList ? 202 : 404;
+            $category = Category::find($id);
+            $message = $category ? "Category updated" : "Category cannot be updated";
+            $status = $category ? 202 : 404;
 
 
-            if ($wishList) {
-                $wishList->update($request->only(['user_id']));
+            if ($category) {
+                $category->update($request->only(['name']));
             }
 
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $category ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -139,13 +125,13 @@ class WishListController extends Controller
     public function destroy(string $id)
     {
         try {
-            $wishList = WishList::find($id);
+            $category = Category::find($id);
 
-            if ($wishList) {
-                $wishList->delete($id);
+            if ($category) {
+                $category->delete($id);
             }
-            $message = $wishList ? "Wish List destroyed" : "Wish List cannot be destroyed";
-            $status = $wishList ? 202 : 404;
+            $message = $category ? "Category destroyed" : "Category cannot be destroyed";
+            $status = $category ? 202 : 404;
             $response = [
                 'message' => $message,
                 'status' => $status,

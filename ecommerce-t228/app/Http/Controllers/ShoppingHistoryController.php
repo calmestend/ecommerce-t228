@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ShoppingHistoryController extends Controller
 {
@@ -11,7 +13,9 @@ class ShoppingHistoryController extends Controller
      */
     public function index()
     {
-        return view('client.shopping_history');
+        $sales = Sale::where('user_id', Auth::user()->id)->get();
+
+        return view('client.shopping_history', compact('sales'));
     }
 
     /**

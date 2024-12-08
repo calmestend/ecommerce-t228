@@ -26,6 +26,9 @@
                     </div>
                     @endforeach
                     <h2>Total: {{ $total }}</h2>
+                    @if(session('message'))
+                    <p class="bg-yellow-200 text-yellow-800 p-4 rounded-lg mb-4"> {{ session('message') }} </p>
+                    @endif
                     <form action="{{ route('paypal.payment') }}" method="post">
                         @csrf
                         <input type="hidden" name="total" value="{{ $total }}">

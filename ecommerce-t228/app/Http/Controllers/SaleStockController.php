@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WishList;
-use App\Models\WishListProducts;
+use App\Models\SaleStock;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class WishListController extends Controller
+class SaleStockController extends Controller
 {
     private $headers = [
     "Access-Control-Allow-Origin" => "*",
@@ -18,26 +16,14 @@ class WishListController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function indexView()
-    {
-        $wishListId = Auth::user()->wish_list->id;
-        $wishList = WishList::findOrFail($wishListId);
-        $wishListProducts = WishListProducts::where('wish_list_id', $wishList->id)->get();
-
-        return view('client.wish_list', compact('wishListProducts'));
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         try {
-            $wishLists = WishList::all();
-            $message = $wishLists ? "Wish Lists found" : "Wish Lists not found";
+            $saleStocks = SaleStock::all();
+            $message = $saleStocks ? "Sale Stock found" : "Sale Stock not found";
             $status = 200;
             $response = [
-                'data' => $wishLists ?? '',
+                'data' => $saleStocks ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -59,13 +45,15 @@ class WishListController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required'
+                'sale_id' => 'required',
+                'stock_id' => 'required',
+                'quantity' => 'required',
             ]);
-            $wishList = WishList::create(['user_id' => $request->user_id]);
-            $message = $wishList ? "Wish Lists created" : "Wish Lists cannot be created";
+            $saleStock = SaleStock::create(['name' => $request->name]);
+            $message = $saleStock ? "Sale Stock created" : "Sale Stock cannot be created";
             $status = 201;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $saleStock ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -85,11 +73,11 @@ class WishListController extends Controller
     public function show(string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List found" : "Wish List not found";
+            $saleStock = SaleStock::find($id);
+            $message = $saleStock ? "Sale Stock found" : "Sale Stock not found";
             $status = 200;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $saleStock ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -109,17 +97,21 @@ class WishListController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List updated" : "Wish List cannot be updated";
-            $status = $wishList ? 202 : 404;
+            $saleStock = SaleStock::find($id);
+            $message = $saleStock ? "Sale Stock updated" : "Sale Stock cannot be updated";
+            $status = $saleStock ? 202 : 404;
 
 
-            if ($wishList) {
-                $wishList->update($request->only(['user_id']));
+            if ($saleStock) {
+                $saleStock->update($request->only([
+                    'sale_id',
+                    'stock_id',
+                    'quantity',
+                ]));
             }
 
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $saleStock ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -139,13 +131,13 @@ class WishListController extends Controller
     public function destroy(string $id)
     {
         try {
-            $wishList = WishList::find($id);
+            $saleStock = SaleStock::find($id);
 
-            if ($wishList) {
-                $wishList->delete($id);
+            if ($saleStock) {
+                $saleStock->delete($id);
             }
-            $message = $wishList ? "Wish List destroyed" : "Wish List cannot be destroyed";
-            $status = $wishList ? 202 : 404;
+            $message = $saleStock ? "Sale Stock destroyed" : "Sale Stock cannot be destroyed";
+            $status = $saleStock ? 202 : 404;
             $response = [
                 'message' => $message,
                 'status' => $status,

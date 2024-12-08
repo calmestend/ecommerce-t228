@@ -8,9 +8,20 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 flex ">
-                    @foreach ($products as $product)
-                    <div class="p-4 m-4 border-solid  border-2 border-indigo-600">
+
+                <div class="p-6">
+                    <form method="GET" action="{{ route('catalogue') }}" class="flex space-x-4">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Search products..."
+                            class="rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-200">
+                        <x-primary-button>{{ __('Filter') }}</x-primary-button>
+                    </form>
+                </div>
+
+                <div class="p-6 text-gray-900 flex flex-wrap">
+                    @forelse ($products as $product)
+                    @if ($product->stock && $product->stock->quantity > 0)
+                    <div class="p-4 m-4 border-solid border-2 border-indigo-600">
                         <img src="{{ url('storage/products/'. $product->thumbnail) }}" alt="{{ $product->name }}">
                         <p>{{ $product->name }}</p>
                         <p>{{ $product->description }}</p>
@@ -37,7 +48,10 @@
                             <x-input-error :messages="$errors->get('stock_id')" class="mt-2" />
                         </form>
                     </div>
-                    @endforeach
+                    @endif
+                    @empty
+                    <p>No products found.</p>
+                    @endforelse
                 </div>
                 <div class="m-4">
                     <x-input-error :messages="$errors->get('quantity')" class="mt-2" />

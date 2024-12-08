@@ -10,9 +10,15 @@ class CatalogueController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $query = $request->input('search');
+        $products = Product::with('stock')
+            ->when($query, function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%");
+            })
+            ->get();
+
         return view('client.catalogue', compact('products'));
     }
 

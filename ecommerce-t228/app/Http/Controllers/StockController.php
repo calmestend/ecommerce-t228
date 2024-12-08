@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WishList;
-use App\Models\WishListProducts;
+use App\Models\Stock;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class WishListController extends Controller
+class StockController extends Controller
 {
     private $headers = [
     "Access-Control-Allow-Origin" => "*",
@@ -18,26 +16,14 @@ class WishListController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function indexView()
-    {
-        $wishListId = Auth::user()->wish_list->id;
-        $wishList = WishList::findOrFail($wishListId);
-        $wishListProducts = WishListProducts::where('wish_list_id', $wishList->id)->get();
-
-        return view('client.wish_list', compact('wishListProducts'));
-    }
-
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         try {
-            $wishLists = WishList::all();
-            $message = $wishLists ? "Wish Lists found" : "Wish Lists not found";
+            $stocks = Stock::all();
+            $message = $stocks ? "Stocks found" : "Stocks not found";
             $status = 200;
             $response = [
-                'data' => $wishLists ?? '',
+                'data' => $stocks ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -59,13 +45,14 @@ class WishListController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required'
+                'product_id' => 'required',
+                'quantity' => 'required',
             ]);
-            $wishList = WishList::create(['user_id' => $request->user_id]);
-            $message = $wishList ? "Wish Lists created" : "Wish Lists cannot be created";
+            $stock = Stock::create(['name' => $request->name]);
+            $message = $stock ? "Stocks created" : "Stocks cannot be created";
             $status = 201;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $stock ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -85,11 +72,11 @@ class WishListController extends Controller
     public function show(string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List found" : "Wish List not found";
+            $stock = Stock::find($id);
+            $message = $stock ? "Stock found" : "Stock not found";
             $status = 200;
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $stock ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -109,17 +96,20 @@ class WishListController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $wishList = WishList::find($id);
-            $message = $wishList ? "Wish List updated" : "Wish List cannot be updated";
-            $status = $wishList ? 202 : 404;
+            $stock = Stock::find($id);
+            $message = $stock ? "Stock updated" : "Stock cannot be updated";
+            $status = $stock ? 202 : 404;
 
 
-            if ($wishList) {
-                $wishList->update($request->only(['user_id']));
+            if ($stock) {
+                $stock->update($request->only([
+                    'product_id',
+                    'quantity'
+                ]));
             }
 
             $response = [
-                'data' => $wishList ?? '',
+                'data' => $stock ?? '',
                 'message' => $message,
                 'status' => $status,
             ];
@@ -139,13 +129,13 @@ class WishListController extends Controller
     public function destroy(string $id)
     {
         try {
-            $wishList = WishList::find($id);
+            $stock = Stock::find($id);
 
-            if ($wishList) {
-                $wishList->delete($id);
+            if ($stock) {
+                $stock->delete($id);
             }
-            $message = $wishList ? "Wish List destroyed" : "Wish List cannot be destroyed";
-            $status = $wishList ? 202 : 404;
+            $message = $stock ? "Stock destroyed" : "Stock cannot be destroyed";
+            $status = $stock ? 202 : 404;
             $response = [
                 'message' => $message,
                 'status' => $status,
