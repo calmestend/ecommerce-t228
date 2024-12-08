@@ -41,7 +41,7 @@ class SaleController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request)
+    public static function store(Request $request)
     {
         try {
             $request->validate([
@@ -55,7 +55,7 @@ class SaleController extends Controller
                 'message' => $message,
                 'status' => $status,
             ];
-            return response()->json(compact('response'))->withHeaders($this->headers);
+            return response()->json(compact('response'));
         } catch (Exception $error) {
             $response = array(
                 'message' => 'Something went wrong',

@@ -29,11 +29,7 @@ class WishListProductController extends Controller
             return redirect()->route('wish_list');
         }
 
-        WishListProducts::create([
-            'product_id' => $request->product_id,
-            'wish_list_id' => $request->wish_list_id
-        ]);
-
+        $this->store($request);
         return redirect()->route('wish_list')->with("message", "Agregado a favoritos");
     }
 
@@ -42,8 +38,7 @@ class WishListProductController extends Controller
      */
     public function destroyView(string $id)
     {
-        $wishListProduct = WishListProducts::findOrFail($id);
-        $wishListProduct->delete();
+        $this->destroy($id);
         return redirect()->back()->with("message", "Producto eliminado");
     }
 
@@ -80,7 +75,8 @@ class WishListProductController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required'
+                'product_id' => 'required',
+                'wish_list_id' => 'required'
             ]);
             $wishListProduct = WishListProducts::create([
                 'product_id' => $request->product_id,
